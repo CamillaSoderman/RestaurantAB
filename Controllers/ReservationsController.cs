@@ -74,6 +74,7 @@ namespace RestaurantAB.Controllers
                 CustomerPhone = request.CustomerPhone,
                 CustomerEmail = request.CustomerEmail
             };
+            _context.Customers.Add(customer);
 
             var reservation = new Reservation
             {
@@ -84,7 +85,16 @@ namespace RestaurantAB.Controllers
             };
 
             _context.Reservations.Add(reservation);
-            await _context.SaveChangesAsync();
+
+            var dto = new ReservationDTO
+            {
+                Id = reservation.Id,
+                TableId = reservation.TableId,
+                StartTime = reservation.StartTime,
+                NumberOfGuests = reservation.NumberOfGuests
+            };
+
+           
 
             return CreatedAtAction(nameof(GetReservationById), new { id = reservation.Id }, reservation);
         }
@@ -92,10 +102,9 @@ namespace RestaurantAB.Controllers
         // GET: api/Reservations/5 as Admin
         [HttpGet("{id:int}")]
         [Authorize(Roles = "Admin")]
-        public async Task<ActionResult<Reservation>> GetReservationById(int id)
+        public async Task<ActionResult<ReservationDTO>> GetReservationById(int id)
         {
             var reservation = await _context.Reservations
-                .Include(r => r.Table)
                 .Include(r => r.Customer)
                 .FirstOrDefaultAsync(r => r.Id == id);
 

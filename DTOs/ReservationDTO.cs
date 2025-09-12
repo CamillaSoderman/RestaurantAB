@@ -1,14 +1,16 @@
-﻿namespace RestaurantAB.DTOs
+﻿
+
+namespace RestaurantAB.DTOs
 {
     public class ReservationDTO
     {
-        public int ReservationId { get; set; }
+        public int Id { get; set; }
 
-        // in customer DTO There is Name, PhoneNumber, Email
-        public CustomerDTO Customer { get; set; }
+        public int CustomerId { get; set; }
+        
+        public int TableId { get; set; }
 
-        // in TableDTO There is TableId, TableNumber, Capacity
-        public TableDTO Table { get; set; }
+        public int NumberOfGuests { get; set; }
 
         public DateTime StartTime { get; set; }
 
