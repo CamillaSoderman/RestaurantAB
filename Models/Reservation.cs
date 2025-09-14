@@ -1,15 +1,28 @@
-﻿namespace RestaurantAB.Models
+﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
+using RestaurantAB.Models;
+
+namespace RestaurantAB.Models
 {
     public class Reservation
     {
-        public int Id { get; set; }
+        [Key]
+        public int ResId { get; set; }
+       
+        [ForeignKey("TableId")]
         public int TableId { get; set; }
         public Table Table { get; set; }
 
+        
+        [ForeignKey("CustomerId")]
         public int CustomerId { get; set; }
         public Customer Customer { get; set; }
+
         public DateTime StartTime { get; set; }
+        public DateTime EndTime { get; set; } 
+
         public int NumberOfGuests { get; set; }
+
 
     }
 }

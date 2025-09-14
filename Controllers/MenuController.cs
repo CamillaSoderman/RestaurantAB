@@ -3,6 +3,8 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using RestaurantAB.Data;
 using RestaurantAB.DTOs;
+using RestaurantAB.Repository.IRepository;
+using RestaurantAB.Services.IServices;
 
 namespace RestaurantAB.Controllers
 {
@@ -10,72 +12,78 @@ namespace RestaurantAB.Controllers
     [ApiController]
     public class MenuController : ControllerBase
     {
-        private readonly RestaurantABDbContext _context;
+        private readonly IMenuService _menuService;
+        //private readonly RestaurantABDbContext _context;
 
-        public MenuController(RestaurantABDbContext context)
+        public MenuController(IMenuService menuService)
         {
-            _context = context;
+           _menuService = menuService;
         }
 
         [HttpGet]
-        [AllowAnonymous] // Allow anonymous access to this endpoint
-        public IActionResult GetMenuItems()
+        [AllowAnonymous]
+        public async Task<ActionResult<List<MenuDTO>>> GetAllMenuItems()
         {
-            var menuItems = _context.Menus.ToList();
-            return Ok(menuItems);
+                var menuItems = await _menuService.GetAllMenuItemsAsync();
+                return Ok(menuItems);
         }
 
-        // Admin add menu item
-        [HttpPost]
-        [Authorize(Roles = "Admin")] // Only Admins can access this endpoint
-        public IActionResult AddMenuItem(MenuDTO menuDTO)
+        [HttpGet("{id:int}")]
+        [AllowAnonymous]
+        public async Task<ActionResult<MenuDTO>> GetMenuItemById(int id)
         {
-            var menuItem = new MenuDTO
-            {
-                Name = menuDTO.Name,
-                Description = menuDTO.Description,
-                Price = menuDTO.Price,
-                IsPopular = menuDTO.IsPopular,
-                ImageUrl = menuDTO.ImageUrl
-            };
-
-            var menuItems = _context.Menus.ToList();
-            return Ok(menuItems);
-        }
-
-        // Admin update menu item
-        [HttpPut]
-        [Authorize(Roles = "Admin")] // Only Admins can access this endpoint
-        public IActionResult UpdateMenuItem(int id, MenuDTO menuDTO)
-        {
-            var menuItem = _context.Menus.Find(id);
+            var menuItem = await _menuService.GetMenuItemByIdAsync(id);
             if (menuItem == null)
             {
                 return NotFound(new { message = "Menu item not found." });
             }
-            menuItem.Name = menuDTO.Name;
-            menuItem.Description = menuDTO.Description;
-            menuItem.Price = menuDTO.Price;
-            menuItem.IsPopular = menuDTO.IsPopular;
-            menuItem.ImageUrl = menuDTO.ImageUrl;
-            _context.SaveChanges();
             return Ok(menuItem);
         }
 
-        // Admin delete menu item
-        [HttpDelete]
-        [Authorize(Roles = "Admin")] // Only Admins can access this endpoint
-        public IActionResult DeleteMenuItem(int id)
+        
+        [HttpPost]
+        [Route("createMenuItem")]
+        [Authorize(Roles = "Admin")]
+        public async Task<ActionResult> CreateMenuItem(MenuDTO menuDTO)
         {
-            var menuItem = _context.Menus.Find(id);
-            if (menuItem == null)
+            var newMenuId = await _menuService.CreateMenuItemAsync(menuDTO);
+            return CreatedAtAction(nameof(GetMenuItemById), new { id = newMenuId }, menuDTO);
+        }
+
+       
+        [HttpPut("{id:int}")]
+        //[Route("updateMenuItem/{id}")]
+        [Authorize(Roles = "Admin")]
+        public async Task<ActionResult> UpdateMenuItem(int id, MenuDTO menuDTO)
+        {
+            if (id != menuDTO.MenuId)
+            {
+                return BadRequest(new { message = "Menu ID mismatch." });
+            }
+            var updated = await _menuService.UpdateMenuItemAsync(menuDTO);
+            if (!updated)
             {
                 return NotFound(new { message = "Menu item not found." });
             }
-            _context.Menus.Remove(menuItem);
-            _context.SaveChanges();
             return NoContent();
         }
+
+        
+        [HttpDelete("{id:int}")]
+        //[Route("deleteMenuItem/{id}")]
+        [Authorize(Roles = "Admin")]
+        public async Task<ActionResult> DeleteMenuItem(int id)
+        {
+            var deleted = await _menuService.DeleteMenuItemAsync(id);
+            if (!deleted)
+            {
+                return NotFound(new { message = "Menu item not found." });
+            }
+            return NoContent();
+        }
+
+
+      
 
     }
 }

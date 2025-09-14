@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using RestaurantAB.Data;
 
@@ -11,9 +12,11 @@ using RestaurantAB.Data;
 namespace RestaurantAB.Migrations
 {
     [DbContext(typeof(RestaurantABDbContext))]
-    partial class RestaurantABDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250913183849_AddEndTimeToReservation")]
+    partial class AddEndTimeToReservation
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

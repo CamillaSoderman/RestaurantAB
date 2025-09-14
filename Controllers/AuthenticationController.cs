@@ -17,10 +17,12 @@ namespace RestaurantAB.Controllers
         private readonly RestaurantABDbContext _context;
         private readonly IConfiguration _configuration;
 
-        public AuthenticationController(RestaurantABDbContext context)
+        public AuthenticationController(RestaurantABDbContext context, IConfiguration configuration)
         {
             _context = context;
+            _configuration = configuration;
         }
+
 
         [HttpPost("register")]
         public IActionResult Register(AdminRegisterDTO newAdmin)
@@ -56,32 +58,61 @@ namespace RestaurantAB.Controllers
                 return Unauthorized(new { message = "Ogiltigt användarnamn eller lösenord" });
             }
 
-            var token = GenerateJwtToken(admin);
+            var token = GenerateJwToken(admin);
 
             return Ok(new {token});
         }
 
-        private string GenerateJwtToken(Admin admin)
+        //public static class JwtGenerator
+        //{
+        //    public static string GenerateJwt(IConfiguration _config, Admin admin)
+        //    {
+        //        var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_config["Jwt:Key"]));
+        //        var credentials = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
+
+        //        var claims = new[]
+        //        {
+        //    new Claim(ClaimTypes.Name, admin.Username)
+        //};
+
+        //        var token = new JwtSecurityToken(
+        //            issuer: _config["Jwt:Issuer"],
+        //            audience: _config["Jwt:Audience"],
+        //            claims: claims,
+        //            expires: DateTime.UtcNow.AddHours(1),
+        //            signingCredentials: credentials
+        //            );
+
+        //        return new JwtSecurityTokenHandler().WriteToken(token);
+        //    }
+        //}
+
+        private string GenerateJwToken(Admin admin)
         {
             var tokenHandler = new JwtSecurityTokenHandler();
             var key = Encoding.UTF8.GetBytes(_configuration["Jwt:Key"]);
 
             var claims = new[]
             {
-                new Claim(ClaimTypes.Name, $"{admin.Username}"),
-                new Claim(ClaimTypes.Role, admin.Role)
-            };
+               new Claim(ClaimTypes.Name, $"{admin.Username}"),
+               new Claim(ClaimTypes.Role, admin.Role)
+           };
 
             var tokenDescriptor = new SecurityTokenDescriptor
             {
                 Subject = new ClaimsIdentity(claims),
+                Issuer = _configuration["Jwt:Issuer"],
+                Audience = _configuration["Jwt:Audience"],
                 Expires = DateTime.UtcNow.AddHours(1),
-                SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), 
+                SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key),
                 SecurityAlgorithms.HmacSha256Signature)
             };
 
             var token = tokenHandler.CreateToken(tokenDescriptor);
             return tokenHandler.WriteToken(token);
         }
-    }
+
+      
+        }
+
 }
