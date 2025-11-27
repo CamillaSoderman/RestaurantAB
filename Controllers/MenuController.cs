@@ -1,8 +1,10 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using RestaurantAB.Data;
 using RestaurantAB.DTOs;
+using RestaurantAB.Models;
 using RestaurantAB.Repository.IRepository;
 using RestaurantAB.Services.IServices;
 
@@ -13,19 +15,31 @@ namespace RestaurantAB.Controllers
     public class MenuController : ControllerBase
     {
         private readonly IMenuService _menuService;
-        //private readonly RestaurantABDbContext _context;
+        private readonly RestaurantABDbContext _context;
+       
 
-        public MenuController(IMenuService menuService)
+        public MenuController(IMenuService menuService, RestaurantABDbContext context)
         {
            _menuService = menuService;
+            _context = context;
         }
 
-        [HttpGet]
-        [AllowAnonymous]
-        public async Task<ActionResult<List<MenuDTO>>> GetAllMenuItems()
+        // -------------------- ALL MENUS --------------------
+        // GET: api/Menu/all
+        [HttpGet("all")]
+        public async Task<ActionResult<IEnumerable<Menu>>> GetAllMenuItems()
         {
-                var menuItems = await _menuService.GetAllMenuItemsAsync();
-                return Ok(menuItems);
+            return await _context.Menus.ToListAsync();
+        }
+
+        // -------------------- POPULAR MENUS --------------------
+        // GET: api/Menu/popular
+        [HttpGet("popular")]
+        public async Task<ActionResult<IEnumerable<Menu>>> GetPopularMenus()
+        {
+            return await _context.Menus
+                .Where(m => m.IsPopular)
+                .ToListAsync();
         }
 
         [HttpGet("{id:int}")]

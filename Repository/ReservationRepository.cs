@@ -14,58 +14,89 @@ namespace RestaurantAB.Repository
             _context = context;
         }
 
+        // -------------------- CREATE --------------------
         public async Task<int> CreateReservationAsync(Reservation reservation)
         {
+            // Always enforce 2-hour duration
+            reservation.EndTime = reservation.StartTime.AddHours(2);
+
             _context.Reservations.Add(reservation);
             await _context.SaveChangesAsync();
 
-            return reservation.ResId;
+            return reservation.Id;
         }
 
-        public async Task<bool> DeleteReservationAsync(int resId)
-        {
-           var rowsAffected = await _context.Reservations.Where(r => r.ResId == resId)
-                .ExecuteDeleteAsync();
-
-            if (rowsAffected > 0)
-            {
-                return true;
-            }
-
-                return false;
-        }
-
-        public async Task<List<Reservation>> GetAllReservationsAsync()
-        {
-            return await _context.Reservations
-                 .Include(r => r.Customer)
-                 .ToListAsync();
-        }
-
-        public async Task<Reservation> GetReservationByIdAsync(int resId)
-        {
-            return await _context.Reservations
-                 .Include(r => r.Customer)
-                 .FirstOrDefaultAsync(r => r.ResId == resId);
-        }
-
-        public async Task<bool> UpdateReservationAsync(Reservation reservation)
-        {
-            _context.Reservations.Update(reservation);
-            var result = await _context.SaveChangesAsync();
-
-            if (result != 0)
-            {
-                return true;
-            }
-            return false;
-        }
         public async Task<int> CreateCustomerAsync(Customer customer)
         {
             _context.Customers.Add(customer);
             await _context.SaveChangesAsync();
             return customer.CustomerId;
         }
+
+        // -------------------- DELETE --------------------
+        public async Task<bool> DeleteReservationAsync(int resId)
+        {
+            var rowsAffected = await _context.Reservations
+                .Where(r => r.Id == resId)
+                .ExecuteDeleteAsync();
+
+            return rowsAffected > 0;
+        }
+
+        // -------------------- READ --------------------
+        public async Task<List<Reservation>> GetAllReservationsAsync()
+        {
+            return await _context.Reservations
+                .Include(r => r.Customer)
+                .ToListAsync();
+        }
+
+        public async Task<Reservation?> GetReservationByIdAsync(int resId)
+        {
+            return await _context.Reservations
+                .Include(r => r.Customer)
+                .FirstOrDefaultAsync(r => r.Id == resId);
+        }
+
+        public async Task<List<Reservation>> GetReservationsForTableAsync(int tableId)
+        {
+            return await _context.Reservations
+                .Where(r => r.TableId == tableId)
+                .Include(r => r.Customer)
+                .ToListAsync();
+        }
+
+        public async Task<Customer?> GetCustomerByEmailAsync(string email)
+        {
+            return await _context.Customers
+                .FirstOrDefaultAsync(c => c.CustomerEmail == email);
+        }
+
+        public async Task<List<Reservation>> GetReservationsByCustomerEmailAsync(string email)
+        {
+            return await _context.Reservations
+                .Include(r => r.Customer)
+                .Where(r => r.Customer.CustomerEmail == email)
+                .ToListAsync();
+        }
+
+        // -------------------- UPDATE --------------------
+        public async Task<bool> UpdateReservationAsync(Reservation reservation)
+        {
+            // Always enforce 2-hour duration
+            reservation.EndTime = reservation.StartTime.AddHours(2);
+
+            _context.Reservations.Update(reservation);
+            var result = await _context.SaveChangesAsync();
+            return result > 0;
+        }
+
+        // -------------------- TABLES --------------------
+        public async Task<Table?> GetTableByIdAsync(int tableId)
+        {
+            return await _context.Tables.FindAsync(tableId);
+        }
+
         public async Task<List<Reservation>> GetAllAvailableTables(DateTime startTime, int numberOfGuests)
         {
             var tables = await _context.Tables
@@ -78,44 +109,32 @@ namespace RestaurantAB.Repository
             {
                 bool occupied = await _context.Reservations
                     .AnyAsync(r => r.TableId == table.Id &&
-                   startTime >= r.StartTime.AddHours(-2) &&
-                   startTime <= r.StartTime.AddHours(2));
+                                   r.StartTime < startTime.AddHours(2) &&
+                                   r.EndTime > startTime);
+
                 if (!occupied)
                 {
                     var reservation = new Reservation
                     {
                         TableId = table.Id,
-                        StartTime = startTime
+                        StartTime = startTime,
+                        EndTime = startTime.AddHours(2), // enforce 2 hours
+                        NumberOfGuests = numberOfGuests
                     };
                     availableTables.Add(reservation);
                 }
             }
             return availableTables;
         }
-        public async Task<List<Reservation>> GetReservationsForTableAsync(int tableId)
-        {
-            return await _context.Reservations
-                .Where(r => r.TableId == tableId)
-                .ToListAsync();
-        }
-        public async Task<Customer?> GetCustomerByEmailAsync(string email)
-        {
-            return await _context.Customers.FirstOrDefaultAsync(c => c.CustomerEmail == email);
-        }
 
-        public async Task<List<Reservation>> GetReservationsByCustomerEmailAsync(string email)
+        public async Task<bool> IsTableOccupiedAsync(int tableId, DateTime startTime)
         {
-            return await _context.Reservations
-                .Include(r => r.Customer)
-                .Where(r => r.Customer.CustomerEmail == email)
-                .ToListAsync();
-        }
+            var endTime = startTime.AddHours(2);
 
-        public async Task<Reservation?> GatReservationByIdAsync(int id)
-        {
             return await _context.Reservations
-                .Include(r => r.Customer)
-                .FirstOrDefaultAsync(r => r.ResId == id);
+                .AnyAsync(r => r.TableId == tableId &&
+                               r.StartTime < endTime &&
+                               r.EndTime > startTime);
         }
     }
 }

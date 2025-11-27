@@ -7,7 +7,8 @@ namespace RestaurantAB.Models
         [Key]
         public int Id { get; set; }
         public string Username { get; set; }
-        [MaxLength(50)]
+
+        [MaxLength(20)]
         public string Role { get; set; }
 
         [MaxLength(50)]

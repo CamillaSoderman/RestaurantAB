@@ -3,7 +3,7 @@ using RestaurantAB.Models;
 using RestaurantAB.Repository.IRepository;
 using RestaurantAB.Services.IServices;
 
-namespace RestaurantAB.Services
+namespace RestaurantAB.Services.Implementation
 {
     public class MenuService : IMenuService
     {

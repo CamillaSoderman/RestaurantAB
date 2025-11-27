@@ -1,10 +1,11 @@
-﻿using RestaurantAB.DTOs;
+﻿using Azure.Core;
+using RestaurantAB.DTOs;
 using RestaurantAB.DTOs.ReservationDTOs;
 using RestaurantAB.Models;
 using RestaurantAB.Repository.IRepository;
 using RestaurantAB.Services.IServices;
 
-namespace RestaurantAB.Services
+namespace RestaurantAB.Services.Implementation
 {
     public class ReservationService : IReservationService
     {
@@ -31,14 +32,19 @@ namespace RestaurantAB.Services
             var startTime = request.StartTime;
             var endTime = startTime.AddHours(2); // Setting reservation duration to 2 hours
 
-            // Check if the table is available for the requested time slot and number of guests
-            var availableTables = await _resRepo.GetAllAvailableTables(startTime, request.Guests);
-            var istableAvailable = availableTables.Any(t => t.TableId == request.TableId);
-
-            if (!istableAvailable)
+            var isOccupied = await _resRepo.IsTableOccupiedAsync(request.TableId, request.StartTime);
+            if (isOccupied)
             {
-                throw new InvalidOperationException("The table is not available for the selected time slot or does not meet the guest requirements.");
+                throw new InvalidOperationException("The table is already booked for the selected time.");
             }
+
+            var table = await _resRepo.GetTableByIdAsync(request.TableId);
+            if (table == null || table.Capacity < request.Guests)
+            {
+                throw new InvalidOperationException("The table does not exist or cannot accommodate the number of guests.");
+            }
+
+
 
             // Check if customer already exists by email
             var existingCustomer = await _resRepo.GetCustomerByEmailAsync(request.CustomerEmail);
@@ -68,6 +74,7 @@ namespace RestaurantAB.Services
                 TableId = request.TableId,
                 CustomerId = customerId, // From system, not input from customer
                 StartTime = request.StartTime,
+                EndTime = request.StartTime.AddHours(2),
                 NumberOfGuests = request.Guests
             };
 
@@ -93,7 +100,7 @@ namespace RestaurantAB.Services
             
            return reservations.Select(res => new ReservationDTO
             {
-                ResId = res.ResId,
+                Id = res.Id,
                 TableId = res.TableId,
                 StartTime = res.StartTime,
                 NumberOfGuests = res.NumberOfGuests,
@@ -106,7 +113,7 @@ namespace RestaurantAB.Services
             var reservations = await _resRepo.GetAllReservationsAsync();
             return reservations.Select(res => new ReservationAdminDTO
             {
-                ResId = res.ResId,
+                ResId = res.Id,
                 TableId = res.TableId,
                 CustomerId = res.CustomerId,
                 StartTime = res.StartTime,
@@ -139,7 +146,7 @@ namespace RestaurantAB.Services
 
         public async Task<bool> UpdateReservationAsync(int id, ReservationDTO resDTO)
         {
-            var existingRes = await _resRepo.GetReservationByIdAsync(resDTO.ResId);
+            var existingRes = await _resRepo.GetReservationByIdAsync(resDTO.Id);
 
             if (existingRes == null)
             {
@@ -147,11 +154,18 @@ namespace RestaurantAB.Services
             }
 
             // Show reservation details before update
+            existingRes.TableId = resDTO.TableId;
+            existingRes.StartTime = resDTO.StartTime;
+            existingRes.EndTime = resDTO.StartTime.AddHours(2); // booking will always be 2 hours
+            existingRes.NumberOfGuests = resDTO.NumberOfGuests;
+
             Console.WriteLine($"Existing Reservation: " +
-                $"ResId={existingRes.ResId}, " +
+                $"ResId={existingRes.Id}, " +
                 $"TableId={existingRes.TableId}, " +
                 $"StartTime={existingRes.StartTime}, " +
+                $"EndTime={existingRes.EndTime}, " +
                 $"NumberOfGuests={existingRes.NumberOfGuests}");
+
 
             await _resRepo.UpdateReservationAsync(existingRes);
 
@@ -164,7 +178,7 @@ namespace RestaurantAB.Services
             var availableTablesDTO = availableTables.Select(t => new TableDTO
             {
                 TableId = t.TableId,
-                Capacity = t.NumberOfGuests
+                Capacity = _resRepo.GetTableByIdAsync(t.TableId).Result.Capacity
             }).ToList();
 
             return availableTablesDTO;
@@ -175,7 +189,7 @@ namespace RestaurantAB.Services
             var reservations = await _resRepo.GetAllReservationsAsync();
             return reservations.Select(r => new ReservationAdminDTO
             {
-                ResId = r.ResId,
+                ResId = r.Id,
                 TableId = r.TableId,
                 CustomerId = r.CustomerId,
                 StartTime = r.StartTime,
@@ -198,7 +212,7 @@ namespace RestaurantAB.Services
 
             var resDTO = new ReservationAdminDTO
             {
-                ResId = reservation.ResId,
+                ResId = reservation.Id,
                 TableId = reservation.TableId,
                 CustomerId = reservation.CustomerId,
                 StartTime = reservation.StartTime,
@@ -209,6 +223,18 @@ namespace RestaurantAB.Services
             };
 
             return resDTO;
+        }
+
+        public async Task<TableDTO?> GetTableByIdAsync(int tableId)
+        {
+            var table = await _resRepo.GetTableByIdAsync(tableId);
+            if (table == null) return null;
+
+            return new TableDTO
+            {
+                TableId = table.Id,
+                Capacity = table.Capacity
+            };
         }
     }
 }

@@ -18,6 +18,11 @@ namespace RestaurantAB.Repository.IRepository
         Task<Customer?> GetCustomerByEmailAsync(string email);
         Task<List<Reservation>> GetReservationsByCustomerEmailAsync(string email);
 
+        Task<bool> IsTableOccupiedAsync(int tableId, DateTime startTime);
+
+        Task<Table?> GetTableByIdAsync(int tableId);
+
+
 
     }
 }

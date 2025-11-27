@@ -5,7 +5,7 @@ using Microsoft.OpenApi.Models;
 using RestaurantAB.Data;
 using RestaurantAB.Repository;
 using RestaurantAB.Repository.IRepository;
-using RestaurantAB.Services;
+using RestaurantAB.Services.Implementation;
 using RestaurantAB.Services.IServices;
 
 namespace RestaurantAB

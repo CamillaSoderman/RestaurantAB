@@ -12,8 +12,8 @@ using RestaurantAB.Data;
 namespace RestaurantAB.Migrations
 {
     [DbContext(typeof(RestaurantABDbContext))]
-    [Migration("20250831120906_InitialCreate")]
-    partial class InitialCreate
+    [Migration("20251119211759_init00203293")]
+    partial class init00203293
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -33,9 +33,19 @@ namespace RestaurantAB.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
+                    b.Property<string>("Email")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
                     b.Property<string>("PasswordHash")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Role")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
 
                     b.Property<string>("Username")
                         .IsRequired()
@@ -44,27 +54,57 @@ namespace RestaurantAB.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Admins");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 2,
+                            Email = "admin@example.se",
+                            PasswordHash = "$2a$11$9uQkYwVhQ9JH7oXzFqZkUuYz7QhZVhZkzFfZkzYwqk5JcFhQxvZp1u",
+                            Role = "Admin",
+                            Username = "Admin"
+                        });
                 });
 
             modelBuilder.Entity("RestaurantAB.Models.Customer", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<int>("CustomerId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("CustomerId"));
 
-                    b.Property<string>("Name")
+                    b.Property<string>("CustomerEmail")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("PhoneNumber")
+                    b.Property<string>("CustomerName")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.HasKey("Id");
+                    b.Property<string>("CustomerPhone")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("CustomerId");
 
                     b.ToTable("Customers");
+
+                    b.HasData(
+                        new
+                        {
+                            CustomerId = 1,
+                            CustomerEmail = "anna@example.com",
+                            CustomerName = "Anna Svensson",
+                            CustomerPhone = "0701234567"
+                        },
+                        new
+                        {
+                            CustomerId = 2,
+                            CustomerEmail = "erik@example.com",
+                            CustomerName = "Erik Johansson",
+                            CustomerPhone = "0707654321"
+                        });
                 });
 
             modelBuilder.Entity("RestaurantAB.Models.Menu", b =>
@@ -76,7 +116,6 @@ namespace RestaurantAB.Migrations
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<string>("Description")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("ImageUrl")
@@ -90,11 +129,56 @@ namespace RestaurantAB.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<decimal>("Price")
-                        .HasColumnType("decimal(18,2)");
+                        .HasPrecision(10, 2)
+                        .HasColumnType("decimal(10,2)");
 
                     b.HasKey("Id");
 
                     b.ToTable("Menus");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            IsPopular = false,
+                            Name = "Pizza Margherita",
+                            Price = 95.00m
+                        },
+                        new
+                        {
+                            Id = 2,
+                            IsPopular = false,
+                            Name = "Pasta Carbonara",
+                            Price = 110.00m
+                        },
+                        new
+                        {
+                            Id = 3,
+                            IsPopular = false,
+                            Name = "Caesar Salad",
+                            Price = 85.00m
+                        },
+                        new
+                        {
+                            Id = 4,
+                            IsPopular = true,
+                            Name = "Kebab",
+                            Price = 95.00m
+                        },
+                        new
+                        {
+                            Id = 5,
+                            IsPopular = true,
+                            Name = "Banana split",
+                            Price = 110.00m
+                        },
+                        new
+                        {
+                            Id = 6,
+                            IsPopular = true,
+                            Name = "Pie",
+                            Price = 85.00m
+                        });
                 });
 
             modelBuilder.Entity("RestaurantAB.Models.Reservation", b =>
@@ -105,8 +189,14 @@ namespace RestaurantAB.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
+                    b.Property<string>("AccessCode")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<int>("CustomerId")
                         .HasColumnType("int");
+
+                    b.Property<DateTime>("EndTime")
+                        .HasColumnType("datetime2");
 
                     b.Property<int>("NumberOfGuests")
                         .HasColumnType("int");
@@ -124,6 +214,26 @@ namespace RestaurantAB.Migrations
                     b.HasIndex("TableId");
 
                     b.ToTable("Reservations");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            CustomerId = 1,
+                            EndTime = new DateTime(2025, 11, 20, 20, 0, 0, 0, DateTimeKind.Unspecified),
+                            NumberOfGuests = 4,
+                            StartTime = new DateTime(2025, 11, 20, 18, 0, 0, 0, DateTimeKind.Unspecified),
+                            TableId = 2
+                        },
+                        new
+                        {
+                            Id = 2,
+                            CustomerId = 2,
+                            EndTime = new DateTime(2025, 11, 21, 21, 30, 0, 0, DateTimeKind.Unspecified),
+                            NumberOfGuests = 2,
+                            StartTime = new DateTime(2025, 11, 21, 19, 30, 0, 0, DateTimeKind.Unspecified),
+                            TableId = 1
+                        });
                 });
 
             modelBuilder.Entity("RestaurantAB.Models.Table", b =>
@@ -143,6 +253,26 @@ namespace RestaurantAB.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Tables");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            Capacity = 2,
+                            TableNumber = 0
+                        },
+                        new
+                        {
+                            Id = 2,
+                            Capacity = 4,
+                            TableNumber = 0
+                        },
+                        new
+                        {
+                            Id = 3,
+                            Capacity = 6,
+                            TableNumber = 0
+                        });
                 });
 
             modelBuilder.Entity("RestaurantAB.Models.Reservation", b =>

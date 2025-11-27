@@ -12,8 +12,8 @@ using RestaurantAB.Data;
 namespace RestaurantAB.Migrations
 {
     [DbContext(typeof(RestaurantABDbContext))]
-    [Migration("20250902095723_newInit")]
-    partial class newInit
+    [Migration("20251119210241_init9")]
+    partial class init9
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -44,8 +44,8 @@ namespace RestaurantAB.Migrations
 
                     b.Property<string>("Role")
                         .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
 
                     b.Property<string>("Username")
                         .IsRequired()
@@ -54,6 +54,16 @@ namespace RestaurantAB.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Admins");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            Email = "admin@example.com",
+                            PasswordHash = "$2a$11$QeYkYwVhQ9JH7oXzFqZkUuYz7QhZVhZkzFfZkzYwqk5JcFhQxvZp1u",
+                            Role = "Admin",
+                            Username = "admin"
+                        });
                 });
 
             modelBuilder.Entity("RestaurantAB.Models.Customer", b =>
@@ -79,6 +89,22 @@ namespace RestaurantAB.Migrations
                     b.HasKey("CustomerId");
 
                     b.ToTable("Customers");
+
+                    b.HasData(
+                        new
+                        {
+                            CustomerId = 1,
+                            CustomerEmail = "anna@example.com",
+                            CustomerName = "Anna Svensson",
+                            CustomerPhone = "0701234567"
+                        },
+                        new
+                        {
+                            CustomerId = 2,
+                            CustomerEmail = "erik@example.com",
+                            CustomerName = "Erik Johansson",
+                            CustomerPhone = "0707654321"
+                        });
                 });
 
             modelBuilder.Entity("RestaurantAB.Models.Menu", b =>
@@ -90,7 +116,6 @@ namespace RestaurantAB.Migrations
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<string>("Description")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("ImageUrl")
@@ -104,7 +129,8 @@ namespace RestaurantAB.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<decimal>("Price")
-                        .HasColumnType("decimal(18,2)");
+                        .HasPrecision(10, 2)
+                        .HasColumnType("decimal(10,2)");
 
                     b.HasKey("Id");
 
@@ -114,29 +140,44 @@ namespace RestaurantAB.Migrations
                         new
                         {
                             Id = 1,
-                            Description = "Saftig burgare med ost",
-                            ImageUrl = "https://example.com/cheeseburger.jpg",
-                            IsPopular = true,
-                            Name = "Cheeseburger",
-                            Price = 99.0m
+                            IsPopular = false,
+                            Name = "Pizza Margherita",
+                            Price = 95.00m
                         },
                         new
                         {
                             Id = 2,
-                            Description = "Fräsch sallad med kyckling och parmesan",
-                            ImageUrl = "https://example.com/caesarsalad.jpg",
                             IsPopular = false,
-                            Name = "Caesarsallad",
-                            Price = 85.0m
+                            Name = "Pasta Carbonara",
+                            Price = 110.00m
                         },
                         new
                         {
                             Id = 3,
-                            Description = "Kladdig chokladtårta med grädde",
-                            ImageUrl = "https://example.com/chokladtarta.jpg",
+                            IsPopular = false,
+                            Name = "Caesar Salad",
+                            Price = 85.00m
+                        },
+                        new
+                        {
+                            Id = 4,
                             IsPopular = true,
-                            Name = "Chokladtårta",
-                            Price = 55.0m
+                            Name = "Kebab",
+                            Price = 95.00m
+                        },
+                        new
+                        {
+                            Id = 5,
+                            IsPopular = true,
+                            Name = "Banana split",
+                            Price = 110.00m
+                        },
+                        new
+                        {
+                            Id = 6,
+                            IsPopular = true,
+                            Name = "Pie",
+                            Price = 85.00m
                         });
                 });
 
@@ -148,8 +189,14 @@ namespace RestaurantAB.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
+                    b.Property<string>("AccessCode")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<int>("CustomerId")
                         .HasColumnType("int");
+
+                    b.Property<DateTime>("EndTime")
+                        .HasColumnType("datetime2");
 
                     b.Property<int>("NumberOfGuests")
                         .HasColumnType("int");
@@ -167,6 +214,26 @@ namespace RestaurantAB.Migrations
                     b.HasIndex("TableId");
 
                     b.ToTable("Reservations");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            CustomerId = 1,
+                            EndTime = new DateTime(2025, 11, 20, 20, 0, 0, 0, DateTimeKind.Unspecified),
+                            NumberOfGuests = 4,
+                            StartTime = new DateTime(2025, 11, 20, 18, 0, 0, 0, DateTimeKind.Unspecified),
+                            TableId = 2
+                        },
+                        new
+                        {
+                            Id = 2,
+                            CustomerId = 2,
+                            EndTime = new DateTime(2025, 11, 21, 21, 30, 0, 0, DateTimeKind.Unspecified),
+                            NumberOfGuests = 2,
+                            StartTime = new DateTime(2025, 11, 21, 19, 30, 0, 0, DateTimeKind.Unspecified),
+                            TableId = 1
+                        });
                 });
 
             modelBuilder.Entity("RestaurantAB.Models.Table", b =>
@@ -192,19 +259,19 @@ namespace RestaurantAB.Migrations
                         {
                             Id = 1,
                             Capacity = 2,
-                            TableNumber = 1
+                            TableNumber = 0
                         },
                         new
                         {
                             Id = 2,
                             Capacity = 4,
-                            TableNumber = 2
+                            TableNumber = 0
                         },
                         new
                         {
                             Id = 3,
                             Capacity = 6,
-                            TableNumber = 3
+                            TableNumber = 0
                         });
                 });
 

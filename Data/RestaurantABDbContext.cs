@@ -1,12 +1,13 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using RestaurantAB.Models;
 
 namespace RestaurantAB.Data
 {
     public class RestaurantABDbContext : DbContext
     {
-        public RestaurantABDbContext(DbContextOptions<RestaurantABDbContext> options) 
-            : base(options)  { }
+        public RestaurantABDbContext(DbContextOptions<RestaurantABDbContext> options)
+            : base(options) { }
 
         public DbSet<Admin> Admins { get; set; }
         public DbSet<Customer> Customers { get; set; }
@@ -19,54 +20,72 @@ namespace RestaurantAB.Data
         {
             base.OnModelCreating(modelBuilder);
 
-            //// Seed 1 admin
-            //modelBuilder.Entity<Admin>().HasData(new Admin
-            //{
-            //    Id = 1,
-            //    Username = "admin",
-            //    PasswordHash = BCrypt.Net.BCrypt.HashPassword("Admin123!")
-            //});
+  
 
-            // Seed Table
-            modelBuilder.Entity<Table>().HasData(
-                new Table { Id = 1, TableNumber = 1, Capacity = 2 },
-                new Table { Id = 2, TableNumber = 2, Capacity = 4 },
-                new Table { Id = 3, TableNumber = 3, Capacity = 6 }
+            // -------------------- ADMIN --------------------
+            modelBuilder.Entity<Admin>().HasData(
+               new Admin
+               {
+                   Id = 2,
+                   Username = "Admin",
+                   Email = "admin@example.se",
+                   Role = "Admin",
+                   PasswordHash = "$2a$11$uVhX9YwVhQ9JH7oXzFqZkO9uQkYwVhQ9JH7oXzFqZkUuYz7QhZVhZ"
+
+               }
+
             );
 
-            // Seed meny
-            modelBuilder.Entity <Menu>().HasData(
-                new Menu
+            // -------------------- MENU --------------------
+            modelBuilder.Entity<Menu>()
+                .Property(m => m.Price)
+                .HasPrecision(10, 2);
+
+            modelBuilder.Entity<Menu>().HasData(
+                new Menu { Id = 1, Name = "Pizza Margherita", Price = 95.00m, IsPopular = false },
+                new Menu { Id = 2, Name = "Pasta Carbonara", Price = 110.00m, IsPopular = false },
+                new Menu { Id = 3, Name = "Caesar Salad", Price = 85.00m, IsPopular = false },
+                new Menu { Id = 4, Name = "Kebab", Price = 95.00m, IsPopular = true },
+                new Menu { Id = 5, Name = "Banana split", Price = 110.00m, IsPopular = true },
+                new Menu { Id = 6, Name = "Pie", Price = 85.00m, IsPopular = true }
+            );
+
+            // -------------------- CUSTOMERS --------------------
+            modelBuilder.Entity<Customer>().HasData(
+                new Customer { CustomerId = 1, CustomerName = "Anna Svensson", CustomerPhone = "0701234567", CustomerEmail = "anna@example.com" },
+                new Customer { CustomerId = 2, CustomerName = "Erik Johansson", CustomerPhone = "0707654321", CustomerEmail = "erik@example.com" }
+            );
+
+            // -------------------- TABLES --------------------
+            modelBuilder.Entity<Table>().HasData(
+                new Table { Id = 1, Capacity = 2 },
+                new Table { Id = 2, Capacity = 4 },
+                new Table { Id = 3, Capacity = 6 }
+            );
+
+            // -------------------- RESERVATIONS --------------------
+            modelBuilder.Entity<Reservation>().HasData(
+                new Reservation
                 {
                     Id = 1,
-                    Name = "Cheeseburger",
-                    Description = "Saftig burgare med ost",
-                    Price = 99.0m,
-                    IsPopular = true,
-                    ImageUrl = "https://example.com/cheeseburger.jpg"
+                    CustomerId = 1,
+                    TableId = 2,
+                    NumberOfGuests = 4,
+                    StartTime = new DateTime(2025, 11, 20, 18, 00, 00),
+                    EndTime = new DateTime(2025, 11, 20, 20, 00, 00)
                 },
-                new Menu
+                new Reservation
                 {
                     Id = 2,
-                    Name = "Caesarsallad",
-                    Description = "Fräsch sallad med kyckling och parmesan",
-                    Price = 85.0m,
-                    IsPopular = false,
-                    ImageUrl = "https://example.com/caesarsalad.jpg"
-                },
-                new Menu
-                {
-                    Id = 3,
-                    Name = "Chokladtårta",
-                    Description = "Kladdig chokladtårta med grädde",
-                    Price = 55.0m,
-                    IsPopular = true,
-                    ImageUrl = "https://example.com/chokladtarta.jpg"
+                    CustomerId = 2,
+                    TableId = 1,
+                    NumberOfGuests = 2,
+                    StartTime = new DateTime(2025, 11, 21, 19, 30, 00),
+                    EndTime = new DateTime(2025, 11, 21, 21, 30, 00)
                 }
             );
         }
-
+    }
     }
 
 
-}

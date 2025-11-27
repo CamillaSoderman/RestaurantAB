@@ -28,7 +28,7 @@ namespace RestaurantAB.Controllers
         public IActionResult Register(AdminRegisterDTO newAdmin)
         {
             // Check if username already exists
-            if (_context.Admins.Any(a => a.Username == newAdmin.Username))
+            if (_context.Admins.Any(a => a.Email == newAdmin.Email))
             {
                 return BadRequest(new { message = "Användarnamnet är redan taget" });
             }
@@ -50,9 +50,9 @@ namespace RestaurantAB.Controllers
         }
 
         [HttpPost("login")]
-        public async Task<IActionResult> Login(LoginAdminDTO loginAdmin)
+        public async Task<IActionResult> Login(AdminLoginDTO loginAdmin)
         {
-            var admin = _context.Admins.SingleOrDefault(a => a.Username == loginAdmin.Username);
+            var admin = _context.Admins.SingleOrDefault(a => a.Email == loginAdmin.Email);
             if (admin == null || !BCrypt.Net.BCrypt.Verify(loginAdmin.Password, admin.PasswordHash))
             {
                 return Unauthorized(new { message = "Ogiltigt användarnamn eller lösenord" });
@@ -92,11 +92,11 @@ namespace RestaurantAB.Controllers
             var tokenHandler = new JwtSecurityTokenHandler();
             var key = Encoding.UTF8.GetBytes(_configuration["Jwt:Key"]);
 
-            var claims = new[]
-            {
-               new Claim(ClaimTypes.Name, $"{admin.Username}"),
-               new Claim(ClaimTypes.Role, admin.Role)
-           };
+            var claims = new List<Claim>
+{
+    new Claim(ClaimTypes.Name, admin.Email),
+    new Claim(ClaimTypes.Role, admin.Role) 
+};
 
             var tokenDescriptor = new SecurityTokenDescriptor
             {
@@ -110,6 +110,7 @@ namespace RestaurantAB.Controllers
 
             var token = tokenHandler.CreateToken(tokenDescriptor);
             return tokenHandler.WriteToken(token);
+
         }
 
       
