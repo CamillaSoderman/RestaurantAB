@@ -97,35 +97,31 @@ namespace RestaurantAB.Repository
             return await _context.Tables.FindAsync(tableId);
         }
 
-        public async Task<List<Reservation>> GetAllAvailableTables(DateTime startTime, int numberOfGuests)
+        public async Task<List<Table>> GetAllAvailableTablesAsync(DateTime startTime, int numberOfGuests)
         {
             var tables = await _context.Tables
                 .Where(t => t.Capacity >= numberOfGuests)
                 .ToListAsync();
 
-            var availableTables = new List<Reservation>();
+            var availableTables = new List<Table>();
 
             foreach (var table in tables)
             {
                 bool occupied = await _context.Reservations
-                    .AnyAsync(r => r.TableId == table.Id &&
+                    .AnyAsync(r => r.TableId == table.TableId &&
                                    r.StartTime < startTime.AddHours(2) &&
                                    r.EndTime > startTime);
 
                 if (!occupied)
                 {
-                    var reservation = new Reservation
-                    {
-                        TableId = table.Id,
-                        StartTime = startTime,
-                        EndTime = startTime.AddHours(2), // enforce 2 hours
-                        NumberOfGuests = numberOfGuests
-                    };
-                    availableTables.Add(reservation);
+                    availableTables.Add(table);
                 }
             }
+
             return availableTables;
         }
+
+
 
         public async Task<bool> IsTableOccupiedAsync(int tableId, DateTime startTime)
         {

@@ -18,26 +18,16 @@ namespace RestaurantAB.Data
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            // AdminSeed
+          
             base.OnModelCreating(modelBuilder);
+            DataBaseSeederAdmin.Seed(modelBuilder);
+        
 
-  
 
-            // -------------------- ADMIN --------------------
-            modelBuilder.Entity<Admin>().HasData(
-               new Admin
-               {
-                   Id = 2,
-                   Username = "Admin",
-                   Email = "admin@example.se",
-                   Role = "Admin",
-                   PasswordHash = "$2a$11$uVhX9YwVhQ9JH7oXzFqZkO9uQkYwVhQ9JH7oXzFqZkUuYz7QhZVhZ"
 
-               }
-
-            );
-
-            // -------------------- MENU --------------------
-            modelBuilder.Entity<Menu>()
+        // -------------------- MENU --------------------
+        modelBuilder.Entity<Menu>()
                 .Property(m => m.Price)
                 .HasPrecision(10, 2);
 
@@ -58,9 +48,9 @@ namespace RestaurantAB.Data
 
             // -------------------- TABLES --------------------
             modelBuilder.Entity<Table>().HasData(
-                new Table { Id = 1, Capacity = 2 },
-                new Table { Id = 2, Capacity = 4 },
-                new Table { Id = 3, Capacity = 6 }
+                new Table { TableId = 1, Capacity = 2 },
+                new Table { TableId = 2, Capacity = 4 },
+                new Table { TableId = 3, Capacity = 6 }
             );
 
             // -------------------- RESERVATIONS --------------------

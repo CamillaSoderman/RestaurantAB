@@ -1,11 +1,9 @@
 ﻿using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using RestaurantAB.Data;
 using RestaurantAB.DTOs;
 using RestaurantAB.Models;
-using RestaurantAB.Repository.IRepository;
 using RestaurantAB.Services.IServices;
 
 namespace RestaurantAB.Controllers
@@ -16,25 +14,36 @@ namespace RestaurantAB.Controllers
     {
         private readonly IMenuService _menuService;
         private readonly RestaurantABDbContext _context;
-       
+
 
         public MenuController(IMenuService menuService, RestaurantABDbContext context)
         {
-           _menuService = menuService;
+            _menuService = menuService;
             _context = context;
         }
 
         // -------------------- ALL MENUS --------------------
         // GET: api/Menu/all
         [HttpGet("all")]
+        [AllowAnonymous]
         public async Task<ActionResult<IEnumerable<Menu>>> GetAllMenuItems()
         {
             return await _context.Menus.ToListAsync();
         }
 
+        // GET: api/Menu/admin
+        [HttpGet("admin")]
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> GetAllMenus()
+        {
+            var menus = await _context.Menus.ToListAsync();
+            return Ok(menus);
+        }
+
         // -------------------- POPULAR MENUS --------------------
         // GET: api/Menu/popular
         [HttpGet("popular")]
+        [AllowAnonymous]
         public async Task<ActionResult<IEnumerable<Menu>>> GetPopularMenus()
         {
             return await _context.Menus
@@ -54,7 +63,7 @@ namespace RestaurantAB.Controllers
             return Ok(menuItem);
         }
 
-        
+
         [HttpPost]
         [Route("createMenuItem")]
         [Authorize(Roles = "Admin")]
@@ -64,7 +73,7 @@ namespace RestaurantAB.Controllers
             return CreatedAtAction(nameof(GetMenuItemById), new { id = newMenuId }, menuDTO);
         }
 
-       
+
         [HttpPut("{id:int}")]
         //[Route("updateMenuItem/{id}")]
         [Authorize(Roles = "Admin")]
@@ -82,7 +91,7 @@ namespace RestaurantAB.Controllers
             return NoContent();
         }
 
-        
+
         [HttpDelete("{id:int}")]
         //[Route("deleteMenuItem/{id}")]
         [Authorize(Roles = "Admin")]
@@ -97,7 +106,7 @@ namespace RestaurantAB.Controllers
         }
 
 
-      
+
 
     }
 }

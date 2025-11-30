@@ -28,8 +28,13 @@ namespace RestaurantAB.Controllers
         public async Task<ActionResult<List<TableDTO>>> GetAvailableTables(DateTime startTime, int NumberOfGuests)
         {
             var availableTables = await _reservationService.GetAllAvailableTablesAsync(startTime, NumberOfGuests);
+
+            if (availableTables == null || !availableTables.Any())
+                return NotFound(new { message = "No available tables found." });
+
             return Ok(availableTables);
         }
+
 
         // -------------------- ALL RESERVATIONS (ADMIN) --------------------
         [HttpGet("allReservations")]
@@ -149,5 +154,6 @@ namespace RestaurantAB.Controllers
                 table.Capacity
             });
         }
+
     }
 }

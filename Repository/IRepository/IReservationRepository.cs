@@ -12,7 +12,7 @@ namespace RestaurantAB.Repository.IRepository
         Task<bool> UpdateReservationAsync(Reservation reservation);
         Task<bool> DeleteReservationAsync(int resId);
         Task<int> CreateCustomerAsync(Customer customer);
-        Task<List<Reservation>> GetAllAvailableTables(DateTime startTime, int numberOfGuests);
+        Task<List<Table>> GetAllAvailableTablesAsync(DateTime startTime, int numberOfGuests);
         Task<List<Reservation>> GetReservationsForTableAsync(int tableId);
 
         Task<Customer?> GetCustomerByEmailAsync(string email);

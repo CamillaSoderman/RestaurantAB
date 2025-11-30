@@ -12,8 +12,8 @@ using RestaurantAB.Data;
 namespace RestaurantAB.Migrations
 {
     [DbContext(typeof(RestaurantABDbContext))]
-    [Migration("20251119211759_init00203293")]
-    partial class init00203293
+    [Migration("20251130071042_SeedDatabase")]
+    partial class SeedDatabase
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -58,11 +58,11 @@ namespace RestaurantAB.Migrations
                     b.HasData(
                         new
                         {
-                            Id = 2,
-                            Email = "admin@example.se",
-                            PasswordHash = "$2a$11$9uQkYwVhQ9JH7oXzFqZkUuYz7QhZVhZkzFfZkzYwqk5JcFhQxvZp1u",
+                            Id = 1,
+                            Email = "admin@test.com",
+                            PasswordHash = "$2a$11$RovtcehiiN0IRy/Ei1zMy.Aigifq4FQV//349Aq6797501Gg0D0Sm",
                             Role = "Admin",
-                            Username = "Admin"
+                            Username = "SuperAdmin"
                         });
                 });
 
@@ -83,7 +83,6 @@ namespace RestaurantAB.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("CustomerPhone")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("CustomerId");
@@ -238,11 +237,11 @@ namespace RestaurantAB.Migrations
 
             modelBuilder.Entity("RestaurantAB.Models.Table", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<int>("TableId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("TableId"));
 
                     b.Property<int>("Capacity")
                         .HasColumnType("int");
@@ -250,26 +249,26 @@ namespace RestaurantAB.Migrations
                     b.Property<int>("TableNumber")
                         .HasColumnType("int");
 
-                    b.HasKey("Id");
+                    b.HasKey("TableId");
 
                     b.ToTable("Tables");
 
                     b.HasData(
                         new
                         {
-                            Id = 1,
+                            TableId = 1,
                             Capacity = 2,
                             TableNumber = 0
                         },
                         new
                         {
-                            Id = 2,
+                            TableId = 2,
                             Capacity = 4,
                             TableNumber = 0
                         },
                         new
                         {
-                            Id = 3,
+                            TableId = 3,
                             Capacity = 6,
                             TableNumber = 0
                         });

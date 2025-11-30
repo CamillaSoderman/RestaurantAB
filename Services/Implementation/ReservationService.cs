@@ -2,6 +2,7 @@
 using RestaurantAB.DTOs;
 using RestaurantAB.DTOs.ReservationDTOs;
 using RestaurantAB.Models;
+using RestaurantAB.Repository;
 using RestaurantAB.Repository.IRepository;
 using RestaurantAB.Services.IServices;
 
@@ -20,7 +21,7 @@ namespace RestaurantAB.Services.Implementation
             var customer = new Customer
             {
                 CustomerName = custDTO.CustomerName,
-                CustomerPhone = custDTO.CustomerPhone,
+                //CustomerPhone = custDTO.CustomerPhone,
                 CustomerEmail = custDTO.CustomerEmail
             };
 
@@ -60,7 +61,7 @@ namespace RestaurantAB.Services.Implementation
                 var newCustomer = new Customer
                 {
                     CustomerName = request.CustomerName,
-                    CustomerPhone = request.CustomerPhone,
+                    //CustomerPhone = request.CustomerPhone,
                     CustomerEmail = request.CustomerEmail
                 };
                 customerId = await _resRepo.CreateCustomerAsync(newCustomer);
@@ -120,7 +121,7 @@ namespace RestaurantAB.Services.Implementation
                 NumberOfGuests = res.NumberOfGuests,
                 CustomerName = res.Customer.CustomerName,
                 CustomerEmail = res.Customer.CustomerEmail,
-                CustomerPhone = res.Customer.CustomerPhone
+               // CustomerPhone = res.Customer.CustomerPhone
             }).ToList();
         }
 
@@ -173,16 +174,17 @@ namespace RestaurantAB.Services.Implementation
         }
         public async Task<List<TableDTO>> GetAllAvailableTablesAsync(DateTime startTime, int numberOfGuests)
         {
-            var availableTables = await _resRepo.GetAllAvailableTables(startTime, numberOfGuests);
+            var tables = await _resRepo.GetAllAvailableTablesAsync(startTime, numberOfGuests);
 
-            var availableTablesDTO = availableTables.Select(t => new TableDTO
+            return tables.Select(t => new TableDTO
             {
                 TableId = t.TableId,
-                Capacity = _resRepo.GetTableByIdAsync(t.TableId).Result.Capacity
+                TableNumber = t.TableNumber,
+                Capacity = t.Capacity
             }).ToList();
-
-            return availableTablesDTO;
         }
+
+
 
         public async Task<List<ReservationAdminDTO>> GetAllReservationsAsync()
         {
@@ -196,7 +198,7 @@ namespace RestaurantAB.Services.Implementation
                 NumberOfGuests = r.NumberOfGuests,
                 CustomerName = r.Customer.CustomerName,
                 CustomerEmail = r.Customer.CustomerEmail,
-                CustomerPhone = r.Customer.CustomerPhone
+              //  CustomerPhone = r.Customer.CustomerPhone
             }
             ).ToList();
 
@@ -219,7 +221,7 @@ namespace RestaurantAB.Services.Implementation
                 NumberOfGuests = reservation.NumberOfGuests,
                 CustomerName = reservation.Customer.CustomerName,
                 CustomerEmail = reservation.Customer.CustomerEmail,
-                CustomerPhone = reservation.Customer.CustomerPhone
+                //CustomerPhone = reservation.Customer.CustomerPhone
             };
 
             return resDTO;
@@ -232,7 +234,7 @@ namespace RestaurantAB.Services.Implementation
 
             return new TableDTO
             {
-                TableId = table.Id,
+                TableId = table.TableId,
                 Capacity = table.Capacity
             };
         }

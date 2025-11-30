@@ -8,7 +8,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace RestaurantAB.Migrations
 {
     /// <inheritdoc />
-    public partial class init9 : Migration
+    public partial class SeedDatabase : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -36,7 +36,7 @@ namespace RestaurantAB.Migrations
                     CustomerId = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     CustomerName = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    CustomerPhone = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    CustomerPhone = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     CustomerEmail = table.Column<string>(type: "nvarchar(max)", nullable: false)
                 },
                 constraints: table =>
@@ -65,14 +65,14 @@ namespace RestaurantAB.Migrations
                 name: "Tables",
                 columns: table => new
                 {
-                    Id = table.Column<int>(type: "int", nullable: false)
+                    TableId = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     TableNumber = table.Column<int>(type: "int", nullable: false),
                     Capacity = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Tables", x => x.Id);
+                    table.PrimaryKey("PK_Tables", x => x.TableId);
                 });
 
             migrationBuilder.CreateTable(
@@ -101,14 +101,14 @@ namespace RestaurantAB.Migrations
                         name: "FK_Reservations_Tables_TableId",
                         column: x => x.TableId,
                         principalTable: "Tables",
-                        principalColumn: "Id",
+                        principalColumn: "TableId",
                         onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.InsertData(
                 table: "Admins",
                 columns: new[] { "Id", "Email", "PasswordHash", "Role", "Username" },
-                values: new object[] { 1, "admin@example.com", "$2a$11$QeYkYwVhQ9JH7oXzFqZkUuYz7QhZVhZkzFfZkzYwqk5JcFhQxvZp1u", "Admin", "admin" });
+                values: new object[] { 1, "admin@test.com", "$2a$11$RovtcehiiN0IRy/Ei1zMy.Aigifq4FQV//349Aq6797501Gg0D0Sm", "Admin", "SuperAdmin" });
 
             migrationBuilder.InsertData(
                 table: "Customers",
@@ -134,7 +134,7 @@ namespace RestaurantAB.Migrations
 
             migrationBuilder.InsertData(
                 table: "Tables",
-                columns: new[] { "Id", "Capacity", "TableNumber" },
+                columns: new[] { "TableId", "Capacity", "TableNumber" },
                 values: new object[,]
                 {
                     { 1, 2, 0 },
