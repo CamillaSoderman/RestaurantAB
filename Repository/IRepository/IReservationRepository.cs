@@ -1,7 +1,5 @@
 ﻿using RestaurantAB.Models;
 
-using RestaurantAB.DTOs.ReservationDTOs;
-
 namespace RestaurantAB.Repository.IRepository
 {
     public interface IReservationRepository
@@ -21,7 +19,8 @@ namespace RestaurantAB.Repository.IRepository
         Task<bool> IsTableOccupiedAsync(int tableId, DateTime startTime);
 
         Task<Table?> GetTableByIdAsync(int tableId);
-
+        Task<List<Table>> GetAllTablesAsync();
+        Task<Table?> GetBestAvailableTableAsync(DateTime startTime, int numberOfGuests);
 
 
     }

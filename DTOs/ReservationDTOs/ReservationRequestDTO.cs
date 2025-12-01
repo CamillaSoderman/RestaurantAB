@@ -1,6 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations.Schema;
-
-namespace RestaurantAB.DTOs.ReservationDTOs
+﻿namespace RestaurantAB.DTOs.ReservationDTOs
 {
     public class ReservationRequestDTO
     {

@@ -1,10 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using RestaurantAB.Data;
 using RestaurantAB.DTOs;
 using RestaurantAB.DTOs.ReservationDTOs;
-using RestaurantAB.Models;
 using RestaurantAB.Services.IServices;
 
 namespace RestaurantAB.Controllers
@@ -21,19 +18,67 @@ namespace RestaurantAB.Controllers
             _reservationService = reservationService;
             _context = context;
         }
-
-        // -------------------- AVAILABLE TABLES --------------------
         [HttpGet("available")]
         [AllowAnonymous]
-        public async Task<ActionResult<List<TableDTO>>> GetAvailableTables(DateTime startTime, int NumberOfGuests)
+        public async Task<ActionResult<TableDTO>> GetAvailableTable(
+    [FromQuery] DateTime startTime,
+    [FromQuery] int numberOfGuests)
         {
-            var availableTables = await _reservationService.GetAllAvailableTablesAsync(startTime, NumberOfGuests);
+            if (numberOfGuests <= 0) return BadRequest("Invalid number of guests.");
 
-            if (availableTables == null || !availableTables.Any())
-                return NotFound(new { message = "No available tables found." });
+            // Endast bokningar mellan 10-22
+            if (startTime.Hour < 10 || startTime.Hour >= 22)
+                return BadRequest("Bokningar är endast tillåtna mellan 10:00 och 22:00.");
 
-            return Ok(availableTables);
+            var table = await _reservationService.GetBestAvailableTableAsync(startTime, numberOfGuests);
+
+            if (table == null) return NotFound("Inga lediga bord.");
+
+            return Ok(table);
         }
+
+
+
+        [HttpPost]
+        [AllowAnonymous]
+        public async Task<ActionResult<ReservationDTO>> CreateReservation([FromBody] ReservationRequestDTO request)
+        {
+            if (request == null)
+                return BadRequest(new { message = "Invalid reservation request." });
+
+            try
+            {
+                var newResId = await _reservationService.CreateReservationAsync(request);
+
+                // Fetch the reservation to return details
+                var reservation = await _reservationService.GetReservationByIdAsync(newResId);
+
+                return Ok(reservation);
+            }
+            catch (InvalidOperationException ex)
+            {
+                // e.g., table already booked
+                return BadRequest(new { message = ex.Message });
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error creating reservation: {ex}");
+                return StatusCode(500, new { message = "Internal server error." });
+            }
+        }
+
+        // -------------------- AVAILABLE TABLES --------------------
+        //[HttpGet("available")]
+        //[AllowAnonymous]
+        //public async Task<ActionResult<List<TableDTO>>> GetAvailableTables(DateTime startTime, int NumberOfGuests)
+        //{
+        //    var availableTables = await _reservationService.GetAllAvailableTablesAsync(startTime, NumberOfGuests);
+
+        //    if (availableTables == null || !availableTables.Any())
+        //        return NotFound(new { message = "No available tables found." });
+
+        //    return Ok(availableTables);
+        //}
 
 
         // -------------------- ALL RESERVATIONS (ADMIN) --------------------
@@ -61,33 +106,33 @@ namespace RestaurantAB.Controllers
         }
 
         // -------------------- CREATE RESERVATION --------------------
-        [HttpPost]
-        [AllowAnonymous]
-        public async Task<ActionResult<ReservationDTO>> CreateReservation(ReservationRequestDTO request)
-        {
-            try
-            {
-                var reservationId = await _reservationService.CreateReservationAsync(request);
+        //[HttpPost]
+        //[AllowAnonymous]
+        //public async Task<ActionResult<ReservationDTO>> CreateReservation(ReservationRequestDTO request)
+        //{
+        //    try
+        //    {
+        //        var reservationId = await _reservationService.CreateReservationAsync(request);
 
-                var reservation = await _context.Reservations.FindAsync(reservationId);
-                reservation.AccessCode = Guid.NewGuid().ToString();
-                await _context.SaveChangesAsync();
+        //        var reservation = await _context.Reservations.FindAsync(reservationId);
+        //        reservation.AccessCode = Guid.NewGuid().ToString();
+        //        await _context.SaveChangesAsync();
 
-                return CreatedAtAction(nameof(GetReservationById), new { id = reservation.Id }, new
-                {
-                    reservation.Id,
-                    reservation.TableId,
-                    reservation.StartTime,
-                    reservation.EndTime, 
-                    reservation.NumberOfGuests,
-                    reservation.AccessCode
-                });
-            }
-            catch (InvalidOperationException ex)
-            {
-                return BadRequest(new { message = ex.Message });
-            }
-        }
+        //        return CreatedAtAction(nameof(GetReservationById), new { id = reservation.Id }, new
+        //        {
+        //            reservation.Id,
+        //            reservation.TableId,
+        //            reservation.StartTime,
+        //            reservation.EndTime, 
+        //            reservation.NumberOfGuests,
+        //            reservation.AccessCode
+        //        });
+        //    }
+        //    catch (InvalidOperationException ex)
+        //    {
+        //        return BadRequest(new { message = ex.Message });
+        //    }
+        //}
 
         // -------------------- CUSTOMER RESERVATIONS --------------------
         [HttpGet("customerReservations")]

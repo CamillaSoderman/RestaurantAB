@@ -4,7 +4,6 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
-using RestaurantAB.Data;
 
 #nullable disable
 
@@ -51,16 +50,6 @@ namespace RestaurantAB.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Admins");
-
-                    b.HasData(
-                        new
-                        {
-                            Id = 1,
-                            Email = "admin@test.com",
-                            PasswordHash = "$2a$11$RovtcehiiN0IRy/Ei1zMy.Aigifq4FQV//349Aq6797501Gg0D0Sm",
-                            Role = "Admin",
-                            Username = "SuperAdmin"
-                        });
                 });
 
             modelBuilder.Entity("RestaurantAB.Models.Customer", b =>
@@ -210,26 +199,6 @@ namespace RestaurantAB.Migrations
                     b.HasIndex("TableId");
 
                     b.ToTable("Reservations");
-
-                    b.HasData(
-                        new
-                        {
-                            Id = 1,
-                            CustomerId = 1,
-                            EndTime = new DateTime(2025, 11, 20, 20, 0, 0, 0, DateTimeKind.Unspecified),
-                            NumberOfGuests = 4,
-                            StartTime = new DateTime(2025, 11, 20, 18, 0, 0, 0, DateTimeKind.Unspecified),
-                            TableId = 2
-                        },
-                        new
-                        {
-                            Id = 2,
-                            CustomerId = 2,
-                            EndTime = new DateTime(2025, 11, 21, 21, 30, 0, 0, DateTimeKind.Unspecified),
-                            NumberOfGuests = 2,
-                            StartTime = new DateTime(2025, 11, 21, 19, 30, 0, 0, DateTimeKind.Unspecified),
-                            TableId = 1
-                        });
                 });
 
             modelBuilder.Entity("RestaurantAB.Models.Table", b =>

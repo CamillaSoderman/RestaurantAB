@@ -1,8 +1,6 @@
-﻿using Azure.Core;
-using RestaurantAB.DTOs;
+﻿using RestaurantAB.DTOs;
 using RestaurantAB.DTOs.ReservationDTOs;
 using RestaurantAB.Models;
-using RestaurantAB.Repository;
 using RestaurantAB.Repository.IRepository;
 using RestaurantAB.Services.IServices;
 
@@ -21,7 +19,7 @@ namespace RestaurantAB.Services.Implementation
             var customer = new Customer
             {
                 CustomerName = custDTO.CustomerName,
-                //CustomerPhone = custDTO.CustomerPhone,
+                CustomerPhone = custDTO.CustomerPhone,
                 CustomerEmail = custDTO.CustomerEmail
             };
 
@@ -67,7 +65,7 @@ namespace RestaurantAB.Services.Implementation
                 customerId = await _resRepo.CreateCustomerAsync(newCustomer);
             }
 
-           
+
 
             // If available, create the reservation
             var reservation = new Reservation
@@ -82,7 +80,7 @@ namespace RestaurantAB.Services.Implementation
             var newResId = await _resRepo.CreateReservationAsync(reservation);
             return newResId;
 
-           
+
         }
 
         public async Task<bool> DeleteReservationAsync(int id)
@@ -98,15 +96,15 @@ namespace RestaurantAB.Services.Implementation
         public async Task<List<ReservationDTO>> GetAllReservationsForCustomerAsync(string email)
         {
             var reservations = await _resRepo.GetReservationsByCustomerEmailAsync(email);
-            
-           return reservations.Select(res => new ReservationDTO
+
+            return reservations.Select(res => new ReservationDTO
             {
                 Id = res.Id,
                 TableId = res.TableId,
                 StartTime = res.StartTime,
                 NumberOfGuests = res.NumberOfGuests,
                 CustomerName = res.Customer.CustomerName ?? "Unknown"
-           }).ToList();
+            }).ToList();
         }
 
         public async Task<List<ReservationAdminDTO>> GetAllReservationsForAdminAsync()
@@ -121,7 +119,7 @@ namespace RestaurantAB.Services.Implementation
                 NumberOfGuests = res.NumberOfGuests,
                 CustomerName = res.Customer.CustomerName,
                 CustomerEmail = res.Customer.CustomerEmail,
-               // CustomerPhone = res.Customer.CustomerPhone
+                // CustomerPhone = res.Customer.CustomerPhone
             }).ToList();
         }
 
@@ -172,17 +170,29 @@ namespace RestaurantAB.Services.Implementation
 
             return true;
         }
-        public async Task<List<TableDTO>> GetAllAvailableTablesAsync(DateTime startTime, int numberOfGuests)
+        public async Task<TableDTO?> GetBestAvailableTableAsync(DateTime startTime, int guests)
         {
-            var tables = await _resRepo.GetAllAvailableTablesAsync(startTime, numberOfGuests);
+            var table = await _resRepo.GetBestAvailableTableAsync(startTime, guests);
 
+            if (table == null) return null;
+
+            return new TableDTO
+            {
+                TableId = table.TableId,
+                Capacity = table.Capacity
+            };
+        }
+
+        public async Task<List<TableDTO>> GetAllAvailableTablesAsync(DateTime startTime, int guests)
+        {
+            var tables = await _resRepo.GetAllAvailableTablesAsync(startTime, guests);
             return tables.Select(t => new TableDTO
             {
                 TableId = t.TableId,
-                TableNumber = t.TableNumber,
                 Capacity = t.Capacity
             }).ToList();
         }
+
 
 
 
@@ -198,7 +208,7 @@ namespace RestaurantAB.Services.Implementation
                 NumberOfGuests = r.NumberOfGuests,
                 CustomerName = r.Customer.CustomerName,
                 CustomerEmail = r.Customer.CustomerEmail,
-              //  CustomerPhone = r.Customer.CustomerPhone
+                //  CustomerPhone = r.Customer.CustomerPhone
             }
             ).ToList();
 

@@ -1,5 +1,4 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using RestaurantAB.Data;
 using RestaurantAB.Models;
 using RestaurantAB.Repository.IRepository;
 
@@ -97,31 +96,36 @@ namespace RestaurantAB.Repository
             return await _context.Tables.FindAsync(tableId);
         }
 
-        public async Task<List<Table>> GetAllAvailableTablesAsync(DateTime startTime, int numberOfGuests)
+        //public async Task<List<Table>> GetAllAvailableTablesAsync(DateTime startTime, int numberOfGuests)
+        //{
+        //    var tables = await _context.Tables
+        //        .Where(t => t.Capacity >= numberOfGuests)
+        //        .ToListAsync();
+
+        //    var availableTables = new List<Table>();
+
+        //    foreach (var table in tables)
+        //    {
+        //        bool occupied = await _context.Reservations
+        //            .AnyAsync(r => r.TableId == table.TableId &&
+        //                           r.StartTime < startTime.AddHours(2) &&
+        //                           r.EndTime > startTime);
+
+        //        if (!occupied)
+        //        {
+        //            availableTables.Add(table);
+        //        }
+        //    }
+
+        //    return availableTables;
+        //}
+
+        public async Task<List<Table>> GetAllTablesAsync()
         {
-            var tables = await _context.Tables
-                .Where(t => t.Capacity >= numberOfGuests)
+            return await _context.Tables
+                .Include(t => t.Reservations)   // IMPORTANT for availability checks
                 .ToListAsync();
-
-            var availableTables = new List<Table>();
-
-            foreach (var table in tables)
-            {
-                bool occupied = await _context.Reservations
-                    .AnyAsync(r => r.TableId == table.TableId &&
-                                   r.StartTime < startTime.AddHours(2) &&
-                                   r.EndTime > startTime);
-
-                if (!occupied)
-                {
-                    availableTables.Add(table);
-                }
-            }
-
-            return availableTables;
         }
-
-
 
         public async Task<bool> IsTableOccupiedAsync(int tableId, DateTime startTime)
         {
@@ -132,5 +136,42 @@ namespace RestaurantAB.Repository
                                r.StartTime < endTime &&
                                r.EndTime > startTime);
         }
+        public async Task<List<Table>> GetAllAvailableTablesAsync(DateTime startTime, int numberOfGuests)
+        {
+            // Hämta bord som kan rymma gäster
+            var candidateTables = await _context.Tables
+                .Where(t => t.Capacity >= numberOfGuests)
+                .ToListAsync();
+
+            var availableTables = new List<Table>();
+
+            foreach (var table in candidateTables)
+            {
+                // Kontrollera om bordet är ledigt under valda tider
+                bool occupied = await _context.Reservations
+                    .AnyAsync(r => r.TableId == table.TableId &&
+                                   r.StartTime < startTime.AddHours(2) &&
+                                   r.EndTime > startTime);
+
+                if (!occupied)
+                    availableTables.Add(table);
+            }
+
+            return availableTables;
+        }
+
+        // ✅ Hitta bästa bord (minsta bord som rymmer gäster)
+        public async Task<Table?> GetBestAvailableTableAsync(DateTime startTime, int numberOfGuests)
+        {
+            var tables = await GetAllAvailableTablesAsync(startTime, numberOfGuests);
+
+            // Välj bord med minsta capacity som ändå rymmer gäster
+            return tables.OrderBy(t => t.Capacity).FirstOrDefault();
+        }
+
+
+
+
+
     }
 }

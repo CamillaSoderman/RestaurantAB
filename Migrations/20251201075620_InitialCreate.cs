@@ -8,7 +8,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace RestaurantAB.Migrations
 {
     /// <inheritdoc />
-    public partial class SeedDatabase : Migration
+    public partial class InitialCreate : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -106,11 +106,6 @@ namespace RestaurantAB.Migrations
                 });
 
             migrationBuilder.InsertData(
-                table: "Admins",
-                columns: new[] { "Id", "Email", "PasswordHash", "Role", "Username" },
-                values: new object[] { 1, "admin@test.com", "$2a$11$RovtcehiiN0IRy/Ei1zMy.Aigifq4FQV//349Aq6797501Gg0D0Sm", "Admin", "SuperAdmin" });
-
-            migrationBuilder.InsertData(
                 table: "Customers",
                 columns: new[] { "CustomerId", "CustomerEmail", "CustomerName", "CustomerPhone" },
                 values: new object[,]
@@ -140,15 +135,6 @@ namespace RestaurantAB.Migrations
                     { 1, 2, 0 },
                     { 2, 4, 0 },
                     { 3, 6, 0 }
-                });
-
-            migrationBuilder.InsertData(
-                table: "Reservations",
-                columns: new[] { "Id", "AccessCode", "CustomerId", "EndTime", "NumberOfGuests", "StartTime", "TableId" },
-                values: new object[,]
-                {
-                    { 1, null, 1, new DateTime(2025, 11, 20, 20, 0, 0, 0, DateTimeKind.Unspecified), 4, new DateTime(2025, 11, 20, 18, 0, 0, 0, DateTimeKind.Unspecified), 2 },
-                    { 2, null, 2, new DateTime(2025, 11, 21, 21, 30, 0, 0, DateTimeKind.Unspecified), 2, new DateTime(2025, 11, 21, 19, 30, 0, 0, DateTimeKind.Unspecified), 1 }
                 });
 
             migrationBuilder.CreateIndex(
