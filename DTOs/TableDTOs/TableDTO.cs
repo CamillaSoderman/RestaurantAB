@@ -1,4 +1,4 @@
-﻿namespace RestaurantAB.DTOs
+﻿namespace RestaurantAB.DTOs.TableDTOs
 {
     public class TableDTO
     {

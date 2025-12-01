@@ -2,10 +2,10 @@
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
-using RestaurantAB.Data;
 using RestaurantAB.Repository;
 using RestaurantAB.Repository.IRepository;
 using RestaurantAB.Services.Implementation;
+using RestaurantAB.Services.Interfaces;
 using RestaurantAB.Services.IServices;
 
 namespace RestaurantAB
@@ -21,11 +21,13 @@ namespace RestaurantAB
             builder.Services.AddScoped<IMenuRepository, MenuRepository>();
             builder.Services.AddScoped<IReservationService, ReservationService>();
             builder.Services.AddScoped<IReservationRepository, ReservationRepository>();
+            builder.Services.AddScoped<ITableRepository, TableRepository>();
+            builder.Services.AddScoped<ITableService, TableService>();
 
             builder.Services.AddControllers();
-          
+
             builder.Services.AddEndpointsApiExplorer();
-         
+
 
             builder.Services.AddDbContext<RestaurantABDbContext>(options =>
             options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnect")));
@@ -51,17 +53,17 @@ namespace RestaurantAB
             // To test AUTH in Swagger UI
             builder.Services.AddSwaggerGen(c =>
 {
-                c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
-                {
-                    Name = "Authorization",
-                    Type = SecuritySchemeType.ApiKey,
-                    Scheme = "Bearer",
-                    BearerFormat = "JWT",
-                    In = ParameterLocation.Header,
-                    Description = "Enter JWT token like this: Bearer {your token}"
-                });
+    c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+    {
+        Name = "Authorization",
+        Type = SecuritySchemeType.ApiKey,
+        Scheme = "Bearer",
+        BearerFormat = "JWT",
+        In = ParameterLocation.Header,
+        Description = "Enter JWT token like this: Bearer {your token}"
+    });
 
-                c.AddSecurityRequirement(new OpenApiSecurityRequirement
+    c.AddSecurityRequirement(new OpenApiSecurityRequirement
                 {
                     {
                         new OpenApiSecurityScheme
@@ -75,9 +77,9 @@ namespace RestaurantAB
                         new string[] {}
                     }
                 });
-            });
+});
 
-           
+
 
             var app = builder.Build();
 

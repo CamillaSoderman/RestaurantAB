@@ -1,5 +1,6 @@
 ﻿using RestaurantAB.DTOs;
 using RestaurantAB.DTOs.ReservationDTOs;
+using RestaurantAB.DTOs.TableDTOs;
 using RestaurantAB.Models;
 using RestaurantAB.Repository.IRepository;
 using RestaurantAB.Services.IServices;

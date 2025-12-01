@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using RestaurantAB.DTOs;
 using RestaurantAB.DTOs.ReservationDTOs;
+using RestaurantAB.DTOs.TableDTOs;
 using RestaurantAB.Services.IServices;
 
 namespace RestaurantAB.Controllers
