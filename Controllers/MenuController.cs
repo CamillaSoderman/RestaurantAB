@@ -1,7 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using RestaurantAB.Data;
 using RestaurantAB.DTOs;
 using RestaurantAB.Models;
 using RestaurantAB.Services.IServices;
@@ -67,11 +66,12 @@ namespace RestaurantAB.Controllers
         [HttpPost]
         [Route("createMenuItem")]
         [Authorize(Roles = "Admin")]
-        public async Task<ActionResult> CreateMenuItem(MenuDTO menuDTO)
+        public async Task<ActionResult> CreateMenuItem([FromBody] MenuDTO menuDTO)
         {
             var newMenuId = await _menuService.CreateMenuItemAsync(menuDTO);
             return CreatedAtAction(nameof(GetMenuItemById), new { id = newMenuId }, menuDTO);
         }
+
 
 
         [HttpPut("{id:int}")]

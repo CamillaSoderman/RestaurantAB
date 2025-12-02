@@ -36,13 +36,17 @@ namespace RestaurantAB.Controllers
             return Ok(table);
         }
 
-        // CREATE
         [HttpPost]
         public async Task<IActionResult> Create(CreateTableDTO dto)
         {
+            if (dto.Capacity <= 0)
+                return BadRequest("Invalid capacity");
+
             var id = await _tableService.CreateTableAsync(dto);
+
             return Ok(new { id });
         }
+
 
         // UPDATE
         [HttpPut("{id}")]

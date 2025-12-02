@@ -44,8 +44,10 @@ namespace RestaurantAB.Services.Implementation
             };
 
             await _repo.AddAsync(table);
+
             return table.TableId;
         }
+
 
         public async Task<bool> UpdateTableAsync(int id, UpdateTableDTO dto)
         {
