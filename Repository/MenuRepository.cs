@@ -1,5 +1,4 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using RestaurantAB.Data;
 using RestaurantAB.Models;
 using RestaurantAB.Repository.IRepository;
 
@@ -18,12 +17,12 @@ namespace RestaurantAB.Repository
             _context.Menus.Add(menu);
             await _context.SaveChangesAsync();
 
-            return menu.Id;
+            return menu.MenuId;
         }
 
         public async Task<bool> DeleteMenuItemAsync(int menuId)
         {
-            var rowsAffected = await _context.Menus.Where(m => m.Id == menuId).ExecuteDeleteAsync();
+            var rowsAffected = await _context.Menus.Where(m => m.MenuId == menuId).ExecuteDeleteAsync();
 
             if (rowsAffected > 0)
             {
@@ -41,11 +40,11 @@ namespace RestaurantAB.Repository
 
         public async Task<Menu> GetMenuItemByIdAsync(int menuId)
         {
-          var menuItem = await _context.Menus.FirstOrDefaultAsync(m => m.Id == menuId);
+            var menuItem = await _context.Menus.FirstOrDefaultAsync(m => m.MenuId == menuId);
 
-          // Logic for if menu item does not exist
+            // Logic for if menu item does not exist
 
-          return menuItem;
+            return menuItem;
         }
 
         public async Task<bool> UpdateMenuItemAsync(Menu menu)

@@ -24,12 +24,12 @@ public class RestaurantABDbContext : DbContext
             .HasPrecision(10, 2);
 
         modelBuilder.Entity<Menu>().HasData(
-            new Menu { Id = 1, Name = "Pizza Margherita", Price = 95.00m, IsPopular = false },
-            new Menu { Id = 2, Name = "Pasta Carbonara", Price = 110.00m, IsPopular = false },
-            new Menu { Id = 3, Name = "Caesar Salad", Price = 85.00m, IsPopular = false },
-            new Menu { Id = 4, Name = "Kebab", Price = 95.00m, IsPopular = true },
-            new Menu { Id = 5, Name = "Banana split", Price = 110.00m, IsPopular = true },
-            new Menu { Id = 6, Name = "Pie", Price = 85.00m, IsPopular = true }
+            new Menu { MenuId = 1, Name = "Pizza Margherita", Price = 95.00m, IsPopular = false },
+            new Menu { MenuId = 2, Name = "Pasta Carbonara", Price = 110.00m, IsPopular = false },
+            new Menu { MenuId = 3, Name = "Caesar Salad", Price = 85.00m, IsPopular = false },
+            new Menu { MenuId = 4, Name = "Kebab", Price = 95.00m, IsPopular = true },
+            new Menu { MenuId = 5, Name = "Banana split", Price = 110.00m, IsPopular = true },
+            new Menu { MenuId = 6, Name = "Pie", Price = 85.00m, IsPopular = true }
         );
 
         // -------------------- CUSTOMERS --------------------

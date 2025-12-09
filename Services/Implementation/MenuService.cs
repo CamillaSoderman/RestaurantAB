@@ -17,12 +17,12 @@ namespace RestaurantAB.Services.Implementation
         {
             var menuItem = new Menu
             {
-               Name = menuDTO.Name,
-               Description = menuDTO.Description,
-               Price = menuDTO.Price,
-               IsPopular = menuDTO.IsPopular,
-               ImageUrl = menuDTO.ImageUrl
-               };
+                Name = menuDTO.Name,
+                Description = menuDTO.Description,
+                Price = menuDTO.Price,
+                IsPopular = menuDTO.IsPopular,
+                ImageUrl = menuDTO.ImageUrl
+            };
 
             var newMenuId = await _menuRepo.AddMenuItemAsync(menuItem);
 
@@ -47,7 +47,7 @@ namespace RestaurantAB.Services.Implementation
 
             var menuDTOs = menuItems.Select(m => new MenuDTO
             {
-                MenuId = m.Id,
+                MenuId = m.MenuId,
                 Name = m.Name,
                 Description = m.Description,
                 Price = m.Price,
@@ -63,13 +63,13 @@ namespace RestaurantAB.Services.Implementation
             var menuItem = await _menuRepo.GetMenuItemByIdAsync(menuId);
 
             if (menuItem == null)
-                {
+            {
                 return null;
             }
 
             var menuDTO = new MenuDTO
             {
-                MenuId = menuItem.Id,
+                MenuId = menuItem.MenuId,
                 Name = menuItem.Name,
                 Description = menuItem.Description,
                 Price = menuItem.Price,
@@ -93,7 +93,7 @@ namespace RestaurantAB.Services.Implementation
             {
                 menuItenm.Name = menuDTO.Name;
             }
-            
+
             await _menuRepo.UpdateMenuItemAsync(menuItenm);
 
             return true;

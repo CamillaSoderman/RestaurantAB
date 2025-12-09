@@ -8,7 +8,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace RestaurantAB.Migrations
 {
     /// <inheritdoc />
-    public partial class InitialCreate : Migration
+    public partial class init : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -48,7 +48,7 @@ namespace RestaurantAB.Migrations
                 name: "Menus",
                 columns: table => new
                 {
-                    Id = table.Column<int>(type: "int", nullable: false)
+                    MenuId = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Description = table.Column<string>(type: "nvarchar(max)", nullable: true),
@@ -58,7 +58,7 @@ namespace RestaurantAB.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Menus", x => x.Id);
+                    table.PrimaryKey("PK_Menus", x => x.MenuId);
                 });
 
             migrationBuilder.CreateTable(
@@ -116,7 +116,7 @@ namespace RestaurantAB.Migrations
 
             migrationBuilder.InsertData(
                 table: "Menus",
-                columns: new[] { "Id", "Description", "ImageUrl", "IsPopular", "Name", "Price" },
+                columns: new[] { "MenuId", "Description", "ImageUrl", "IsPopular", "Name", "Price" },
                 values: new object[,]
                 {
                     { 1, null, null, false, "Pizza Margherita", 95.00m },

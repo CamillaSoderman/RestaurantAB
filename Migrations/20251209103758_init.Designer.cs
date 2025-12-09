@@ -11,8 +11,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace RestaurantAB.Migrations
 {
     [DbContext(typeof(RestaurantABDbContext))]
-    [Migration("20251201075620_InitialCreate")]
-    partial class InitialCreate
+    [Migration("20251209103758_init")]
+    partial class init
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -97,11 +97,11 @@ namespace RestaurantAB.Migrations
 
             modelBuilder.Entity("RestaurantAB.Models.Menu", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<int>("MenuId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("MenuId"));
 
                     b.Property<string>("Description")
                         .HasColumnType("nvarchar(max)");
@@ -120,49 +120,49 @@ namespace RestaurantAB.Migrations
                         .HasPrecision(10, 2)
                         .HasColumnType("decimal(10,2)");
 
-                    b.HasKey("Id");
+                    b.HasKey("MenuId");
 
                     b.ToTable("Menus");
 
                     b.HasData(
                         new
                         {
-                            Id = 1,
+                            MenuId = 1,
                             IsPopular = false,
                             Name = "Pizza Margherita",
                             Price = 95.00m
                         },
                         new
                         {
-                            Id = 2,
+                            MenuId = 2,
                             IsPopular = false,
                             Name = "Pasta Carbonara",
                             Price = 110.00m
                         },
                         new
                         {
-                            Id = 3,
+                            MenuId = 3,
                             IsPopular = false,
                             Name = "Caesar Salad",
                             Price = 85.00m
                         },
                         new
                         {
-                            Id = 4,
+                            MenuId = 4,
                             IsPopular = true,
                             Name = "Kebab",
                             Price = 95.00m
                         },
                         new
                         {
-                            Id = 5,
+                            MenuId = 5,
                             IsPopular = true,
                             Name = "Banana split",
                             Price = 110.00m
                         },
                         new
                         {
-                            Id = 6,
+                            MenuId = 6,
                             IsPopular = true,
                             Name = "Pie",
                             Price = 85.00m

@@ -27,7 +27,20 @@ namespace RestaurantAB.Controllers
         [AllowAnonymous]
         public async Task<ActionResult<IEnumerable<Menu>>> GetAllMenuItems()
         {
-            return await _context.Menus.ToListAsync();
+            var menus = await _context.Menus
+    .Select(m => new MenuDTO
+    {
+        MenuId = m.MenuId,
+        Name = m.Name,
+        Description = m.Description,
+        Price = m.Price,
+        IsPopular = m.IsPopular,
+        ImageUrl = m.ImageUrl
+    })
+    .ToListAsync();
+
+            return Ok(menus);
+
         }
 
         // GET: api/Menu/admin
