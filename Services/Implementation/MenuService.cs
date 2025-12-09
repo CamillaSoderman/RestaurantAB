@@ -81,23 +81,21 @@ namespace RestaurantAB.Services.Implementation
 
         public async Task<bool> UpdateMenuItemAsync(MenuDTO menuDTO)
         {
-            var menuItenm = await _menuRepo.GetMenuItemByIdAsync(menuDTO.MenuId);
+            var menuItem = await _menuRepo.GetMenuItemByIdAsync(menuDTO.MenuId);
 
-            // Check if the menu item exists
-            if (menuItenm == null)
-            {
+            if (menuItem == null)
                 return false;
-            }
-            // Update the fields of the existing menu item with values from the DTO
-            if (!string.IsNullOrEmpty(menuDTO.Name))
-            {
-                menuItenm.Name = menuDTO.Name;
-            }
 
-            await _menuRepo.UpdateMenuItemAsync(menuItenm);
+
+            menuItem.Name = menuDTO.Name;
+            menuItem.Description = menuDTO.Description;
+            menuItem.Price = menuDTO.Price;
+            menuItem.IsPopular = menuDTO.IsPopular;
+
+            await _menuRepo.UpdateMenuItemAsync(menuItem);
 
             return true;
-
         }
+
     }
 }
