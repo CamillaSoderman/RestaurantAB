@@ -1,6 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
-using RestaurantAB.Data;
 using RestaurantAB.DTOs;
 using RestaurantAB.Models;
 using System.IdentityModel.Tokens.Jwt;
@@ -67,7 +66,7 @@ namespace RestaurantAB.Controllers
             {
                 new Claim(ClaimTypes.Name, admin.Username),
                 new Claim(ClaimTypes.Email, admin.Email),
-                new Claim(ClaimTypes.Role, admin.Role) // <-- Viktigt för Authorize(Roles="Admin")
+                new Claim(ClaimTypes.Role, admin.Role)
             };
 
             var token = new JwtSecurityToken(

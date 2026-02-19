@@ -91,6 +91,7 @@ namespace RestaurantAB.Services.Implementation
             menuItem.Description = menuDTO.Description;
             menuItem.Price = menuDTO.Price;
             menuItem.IsPopular = menuDTO.IsPopular;
+            menuItem.ImageUrl = menuDTO.ImageUrl;
 
             await _menuRepo.UpdateMenuItemAsync(menuItem);
 

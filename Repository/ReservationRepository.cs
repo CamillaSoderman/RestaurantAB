@@ -96,34 +96,12 @@ namespace RestaurantAB.Repository
             return await _context.Tables.FindAsync(tableId);
         }
 
-        //public async Task<List<Table>> GetAllAvailableTablesAsync(DateTime startTime, int numberOfGuests)
-        //{
-        //    var tables = await _context.Tables
-        //        .Where(t => t.Capacity >= numberOfGuests)
-        //        .ToListAsync();
 
-        //    var availableTables = new List<Table>();
-
-        //    foreach (var table in tables)
-        //    {
-        //        bool occupied = await _context.Reservations
-        //            .AnyAsync(r => r.TableId == table.TableId &&
-        //                           r.StartTime < startTime.AddHours(2) &&
-        //                           r.EndTime > startTime);
-
-        //        if (!occupied)
-        //        {
-        //            availableTables.Add(table);
-        //        }
-        //    }
-
-        //    return availableTables;
-        //}
 
         public async Task<List<Table>> GetAllTablesAsync()
         {
             return await _context.Tables
-                .Include(t => t.Reservations)   // IMPORTANT for availability checks
+                .Include(t => t.Reservations)
                 .ToListAsync();
         }
 
@@ -138,7 +116,7 @@ namespace RestaurantAB.Repository
         }
         public async Task<List<Table>> GetAllAvailableTablesAsync(DateTime startTime, int numberOfGuests)
         {
-            // Hämta bord som kan rymma gäster
+
             var candidateTables = await _context.Tables
                 .Where(t => t.Capacity >= numberOfGuests)
                 .ToListAsync();
@@ -147,7 +125,7 @@ namespace RestaurantAB.Repository
 
             foreach (var table in candidateTables)
             {
-                // Kontrollera om bordet är ledigt under valda tider
+
                 bool occupied = await _context.Reservations
                     .AnyAsync(r => r.TableId == table.TableId &&
                                    r.StartTime < startTime.AddHours(2) &&
@@ -160,12 +138,12 @@ namespace RestaurantAB.Repository
             return availableTables;
         }
 
-        // ✅ Hitta bästa bord (minsta bord som rymmer gäster)
+
         public async Task<Table?> GetBestAvailableTableAsync(DateTime startTime, int numberOfGuests)
         {
             var tables = await GetAllAvailableTablesAsync(startTime, numberOfGuests);
 
-            // Välj bord med minsta capacity som ändå rymmer gäster
+
             return tables.OrderBy(t => t.Capacity).FirstOrDefault();
         }
 

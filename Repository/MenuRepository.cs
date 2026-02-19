@@ -42,7 +42,7 @@ namespace RestaurantAB.Repository
         {
             var menuItem = await _context.Menus.FirstOrDefaultAsync(m => m.MenuId == menuId);
 
-            // Logic for if menu item does not exist
+
 
             return menuItem;
         }

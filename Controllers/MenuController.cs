@@ -75,6 +75,29 @@ namespace RestaurantAB.Controllers
             return Ok(menuItem);
         }
 
+        [HttpGet("admin/{id:int}")]
+        [Authorize(Roles = "Admin")]
+        public async Task<ActionResult<MenuDTO>> GetAdminMenuItemById(int id)
+        {
+            var menu = await _context.Menus
+                .Where(m => m.MenuId == id)
+                .Select(m => new MenuDTO
+                {
+                    MenuId = m.MenuId,
+                    Name = m.Name,
+                    Description = m.Description,
+                    Price = m.Price,
+                    IsPopular = m.IsPopular,
+                    ImageUrl = m.ImageUrl
+                })
+                .FirstOrDefaultAsync();
+
+            if (menu == null)
+                return NotFound();
+
+            return Ok(menu);
+        }
+
 
         [HttpPost]
         [Route("createMenuItem")]
