@@ -5,8 +5,6 @@ using RestaurantAB.Services.Interfaces;
 
 namespace RestaurantAB.Controllers
 {
-    // TABLE CONTROLLER - ADMIN ONLY
-
     [Route("api/[controller]")]
     [ApiController]
     [Authorize(Roles = "Admin")]
@@ -19,7 +17,6 @@ namespace RestaurantAB.Controllers
             _tableService = tableService;
         }
 
-        //  GET ALL TABLES
         [HttpGet]
         public async Task<IActionResult> GetAll()
         {
@@ -27,7 +24,6 @@ namespace RestaurantAB.Controllers
             return Ok(tables);
         }
 
-        // GET BY ID
         [HttpGet("{id}")]
         public async Task<IActionResult> Get(int id)
         {
@@ -37,27 +33,23 @@ namespace RestaurantAB.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Create(CreateTableDTO dto)
+        public async Task<IActionResult> Create([FromBody] CreateTableDTO dto)
         {
             if (dto.Capacity <= 0)
                 return BadRequest("Invalid capacity");
 
             var id = await _tableService.CreateTableAsync(dto);
-
             return Ok(new { id });
         }
 
-
-        // UPDATE
         [HttpPut("{id}")]
-        public async Task<IActionResult> Update(int id, UpdateTableDTO dto)
+        public async Task<IActionResult> Update(int id, [FromBody] UpdateTableDTO dto)
         {
             var updated = await _tableService.UpdateTableAsync(id, dto);
             if (!updated) return NotFound();
             return NoContent();
         }
 
-        // DELETE
         [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(int id)
         {
@@ -66,6 +58,4 @@ namespace RestaurantAB.Controllers
             return NoContent();
         }
     }
-
-
 }

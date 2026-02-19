@@ -6,7 +6,7 @@ namespace RestaurantAB.Models
     public class Reservation
     {
         [Key]
-        public int Id { get; set; }
+        public int ResId { get; set; }
 
         [ForeignKey("TableId")]
         public int TableId { get; set; }
@@ -23,8 +23,7 @@ namespace RestaurantAB.Models
 
         public int NumberOfGuests { get; set; }
 
-        // New for accessCode for customer
-        public string? AccessCode { get; set; }
+
 
 
 

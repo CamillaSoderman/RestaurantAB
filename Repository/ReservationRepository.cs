@@ -22,7 +22,7 @@ namespace RestaurantAB.Repository
             _context.Reservations.Add(reservation);
             await _context.SaveChangesAsync();
 
-            return reservation.Id;
+            return reservation.ResId;
         }
 
         public async Task<int> CreateCustomerAsync(Customer customer)
@@ -36,7 +36,7 @@ namespace RestaurantAB.Repository
         public async Task<bool> DeleteReservationAsync(int resId)
         {
             var rowsAffected = await _context.Reservations
-                .Where(r => r.Id == resId)
+                .Where(r => r.ResId == resId)
                 .ExecuteDeleteAsync();
 
             return rowsAffected > 0;
@@ -54,7 +54,7 @@ namespace RestaurantAB.Repository
         {
             return await _context.Reservations
                 .Include(r => r.Customer)
-                .FirstOrDefaultAsync(r => r.Id == resId);
+                .FirstOrDefaultAsync(r => r.ResId == resId);
         }
 
         public async Task<List<Reservation>> GetReservationsForTableAsync(int tableId)
