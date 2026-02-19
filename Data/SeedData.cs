@@ -40,7 +40,7 @@ namespace RestaurantAB.Data
                     Description = "Klassisk pizza med tomatsås, mozzarella och basilika.",
                     Price = 129,
                     IsPopular = true,
-                    ImageUrl = "Images/margherita.png"
+                    ImageUrl = "Images/margherite.png"
                 },
                 new Menu
                 {
