@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
+using RestaurantAB.Data;
 using RestaurantAB.Repository;
 using RestaurantAB.Repository.IRepository;
 using RestaurantAB.Services.Implementation;
@@ -97,6 +98,15 @@ namespace RestaurantAB
 
 
             app.MapControllers();
+
+            //SeedData seeding
+            using (var scope = app.Services.CreateScope())
+            {
+                var services = scope.ServiceProvider;
+                var context = services.GetRequiredService<RestaurantABDbContext>();
+                SeedData.InitializeAsync(context).GetAwaiter().GetResult();
+            }
+
 
             app.Run();
         }
